@@ -1,0 +1,37 @@
+start=$(date +"%m_%d_%y_%T")
+mkdir Results
+mkdir tmp
+for num_cores in 128 
+do
+for num_locs in 1000
+do
+for num_inst in 45000
+do
+for RD_WR in 9
+do
+for Num_Crits in 100
+do
+for Crit_instances in $((num_cores*50))
+do
+python Inst_Gen.py $num_cores $num_locs $num_inst $RD_WR 0
+python Crit_Sec_Gen.py $num_cores  $num_locs $num_inst $RD_WR $Num_Crits $Crit_instances 1
+python Trace_Gen.py $num_cores
+python MSI.py $num_cores &
+python MESI.py $num_cores &
+python MESIF.py $num_cores &
+python MOESI.py $num_cores &
+python LC.py $num_cores &
+wait
+now=$(date +"%m_%d_%y_%T")
+mkdir tmp/$num_cores-$num_locs-$num_inst-$RD_WR-$Num_Crits-$Crit_instances-$now
+mv *.txt tmp/$num_cores-$num_locs-$num_inst-$RD_WR-$Num_Crits-$Crit_instances-$now/
+mv Result.csv Results/$num_cores-$num_locs-$num_inst-$RD_WR-$Num_Crits-$Crit_instances-$now.csv
+done
+done
+done
+done
+done
+done
+end=$(date +"%m_%d_%y_%T")
+mv Results Results---$start---$end
+mv tmp tmp---$start---$end
