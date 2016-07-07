@@ -11,7 +11,7 @@ done = []
 lock_loc = {}
 
 for i in range(int(num_cores)):
-	fid.append(open('Core%d.txt' % i))
+	fid.append(open('Core%d.txt' % i, 'r').readlines())
 
 file_name = "exe_order.txt"
 target = open(file_name, 'w')
@@ -22,14 +22,10 @@ while(True):
 	while seed in done:
 		seed = (random.randint(0, int(num_cores)-1))	
 	
-	recent_pos = fid[seed].tell()
-	new_line = fid[seed].readline()
-	if not new_line:
-		done.append(seed)
-		if len(done) == int(num_cores):
-			break
-		continue
-	else:
+	
+	if fid[seed]:
+		new_line = fid[seed].pop(0)
+		
 		pattern = re.compile("(RD|WR|ACQ|REL)\((.+)\)") #Pattern exampel : "RD(a)"
 		op = (pattern.search(new_line)).group(1)
 		var = (pattern.search(new_line)).group(2)
@@ -44,7 +40,7 @@ while(True):
 			elif lock_loc[var]==PID:
 				raise NameError("Acquiring location %s by processor %s for the second time" %(var ,PID))
 			else:
-				fid[seed].seek(recent_pos)
+				fid[seed].insert(0,new_line)
 				target.write(PID + " : FAIL_" + new_line)
 				if DEBUG_MODE:
 					print "FAIL_ACQ on processor %s" %PID
@@ -60,6 +56,12 @@ while(True):
 				raise NameError("Releasing location %s by processor %s while locaation is acquired by processor %s" %(var, PID, lock_loc[var]))
 		else:		
 			target.write(PID + " : " + new_line)
+		
+	else:
+		done.append(seed)
+		if len(done) == int(num_cores):
+			break
+		continue
 
 #Generating output file:
 output = open("Result.csv", 'w')

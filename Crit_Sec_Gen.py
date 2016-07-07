@@ -66,6 +66,8 @@ for l in range(int(num_crit_sec)):
 	for i in range(int(crit_sec_instances)):
 		
 		j = random.randint(0, int(num_cores)-1)
+		core_id = "Core%d" %j
+		file_name = core_id + ".txt"
 		
 		if not (crit_directory[sync_var].has_key(file_name)):
 			crit_directory[sync_var][file_name] = []
@@ -82,6 +84,7 @@ for l in range(int(num_crit_sec)):
 					tmp_list.append(line_num)
 				else:
 					Err_Flag = True
+					break
 				
 		
 		tmp_list.append(k)

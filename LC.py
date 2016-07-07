@@ -580,12 +580,12 @@ if FULL_STATS :
 					proc_stats[proc]["LOCS"][location]["FAIL_ACQ"] = stats[location]["PIDS"][proc]["FAIL_ACQ"]
 	#Updating total number of read and writes
 	for proc in proc_stats:
-	for location in proc_stats[proc]["LOCS"]:
-		proc_stats[proc]["RD"] += proc_stats[proc]["LOCS"][location]["RD"]
-		proc_stats[proc]["WR"] += proc_stats[proc]["LOCS"][location]["WR"]
-		proc_stats[proc]["ACQ"] += proc_stats[proc]["LOCS"][location]["ACQ"]
-		proc_stats[proc]["REL"] += proc_stats[proc]["LOCS"][location]["REL"]
-		proc_stats[proc]["FAIL_ACQ"] += proc_stats[proc]["LOCS"][location]["FAIL_ACQ"]
+		for location in proc_stats[proc]["LOCS"]:
+			proc_stats[proc]["RD"] += proc_stats[proc]["LOCS"][location]["RD"]
+			proc_stats[proc]["WR"] += proc_stats[proc]["LOCS"][location]["WR"]
+			proc_stats[proc]["ACQ"] += proc_stats[proc]["LOCS"][location]["ACQ"]
+			proc_stats[proc]["REL"] += proc_stats[proc]["LOCS"][location]["REL"]
+			proc_stats[proc]["FAIL_ACQ"] += proc_stats[proc]["LOCS"][location]["FAIL_ACQ"]
 
 if DEBUG_MODE :
 	print "Printing per location stats"
