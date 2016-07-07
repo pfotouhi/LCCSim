@@ -7,6 +7,7 @@ script, num_cores = argv
 
 DEBUG_MODE = 0
 DETAILED_MODE = 1
+FULL_STATS = 0
 
 #Latency values
 L_HIT = 1
@@ -508,16 +509,15 @@ for line in fid:
 		print_directory(directory)
 		print "-------------\n"
 	
-	
-	#Updating per processor Directoreis
-	
-	for location in directory:
-		for proc in directory[location]:
-			try:
-				proc_directory[proc][location] = directory[location][proc]
-			except KeyError:
-				proc_directory[proc] = {}
-				proc_directory[proc][location] = directory[location][proc]
+	if FULL_STATS :
+		#Updating per processor Directoreis
+		for location in directory:
+			for proc in directory[location]:
+				try:
+					proc_directory[proc][location] = directory[location][proc]
+				except KeyError:
+					proc_directory[proc] = {}
+					proc_directory[proc][location] = directory[location][proc]
 	
 	if DEBUG_MODE :
 		print "Printing per processor directory"
@@ -533,52 +533,53 @@ protocol_stats_snoopy["LC"]["DRAM accesses"] = protocol_stats["LC"]["DRAM access
 protocol_stats_snoopy["LC"]["Cache to cache"] = protocol_stats["LC"]["Cache to cache"]
 protocol_stats_snoopy["LC"]["Latency"] = protocol_stats["LC"]["Latency"]
 
-#Updating per processor stats
-for location in stats:
-	for proc in stats[location]["PIDS"]:
-		if proc_stats.has_key(proc):
-		#try:
-			if proc_stats[proc]["LOCS"].has_key(location):
-				proc_stats[proc]["LOCS"][location]["RD"] = stats[location]["PIDS"][proc]["RD"]
-				proc_stats[proc]["LOCS"][location]["WR"] = stats[location]["PIDS"][proc]["WR"]
-				proc_stats[proc]["LOCS"][location]["ACQ"] = stats[location]["PIDS"][proc]["ACQ"]
-				proc_stats[proc]["LOCS"][location]["REL"] = stats[location]["PIDS"][proc]["REL"]
-				proc_stats[proc]["LOCS"][location]["FAIL_ACQ"] = stats[location]["PIDS"][proc]["FAIL_ACQ"]
+if FULL_STATS :
+	#Updating per processor stats
+	for location in stats:
+		for proc in stats[location]["PIDS"]:
+			if proc_stats.has_key(proc):
+			#try:
+				if proc_stats[proc]["LOCS"].has_key(location):
+					proc_stats[proc]["LOCS"][location]["RD"] = stats[location]["PIDS"][proc]["RD"]
+					proc_stats[proc]["LOCS"][location]["WR"] = stats[location]["PIDS"][proc]["WR"]
+					proc_stats[proc]["LOCS"][location]["ACQ"] = stats[location]["PIDS"][proc]["ACQ"]
+					proc_stats[proc]["LOCS"][location]["REL"] = stats[location]["PIDS"][proc]["REL"]
+					proc_stats[proc]["LOCS"][location]["FAIL_ACQ"] = stats[location]["PIDS"][proc]["FAIL_ACQ"]
+				else:
+					proc_stats[proc]["NUM_Locs"] += 1
+					proc_stats[proc]["LOCS"][location] = {}
+					proc_stats[proc]["LOCS"][location]["RD"] = stats[location]["PIDS"][proc]["RD"]
+					proc_stats[proc]["LOCS"][location]["WR"] = stats[location]["PIDS"][proc]["WR"]
+					proc_stats[proc]["LOCS"][location]["ACQ"] = stats[location]["PIDS"][proc]["ACQ"]
+					proc_stats[proc]["LOCS"][location]["REL"] = stats[location]["PIDS"][proc]["REL"]
+					proc_stats[proc]["LOCS"][location]["FAIL_ACQ"] = stats[location]["PIDS"][proc]["FAIL_ACQ"]
+					
 			else:
-				proc_stats[proc]["NUM_Locs"] += 1
-				proc_stats[proc]["LOCS"][location] = {}
-				proc_stats[proc]["LOCS"][location]["RD"] = stats[location]["PIDS"][proc]["RD"]
-				proc_stats[proc]["LOCS"][location]["WR"] = stats[location]["PIDS"][proc]["WR"]
-				proc_stats[proc]["LOCS"][location]["ACQ"] = stats[location]["PIDS"][proc]["ACQ"]
-				proc_stats[proc]["LOCS"][location]["REL"] = stats[location]["PIDS"][proc]["REL"]
-				proc_stats[proc]["LOCS"][location]["FAIL_ACQ"] = stats[location]["PIDS"][proc]["FAIL_ACQ"]
-				
-		else:
-		#except KeyError:
-			proc_stats[proc] = {}
-			proc_stats[proc]["LOCS"] = {}
-			proc_stats[proc]["NUM_Locs"] = 0
-			proc_stats[proc]["RD"] = 0
-			proc_stats[proc]["WR"] = 0
-			proc_stats[proc]["ACQ"] = 0
-			proc_stats[proc]["REL"] = 0
-			proc_stats[proc]["FAIL_ACQ"] = 0
-			if proc_stats[proc]["LOCS"].has_key(location):
-				proc_stats[proc]["LOCS"][location]["RD"] = stats[location]["PIDS"][proc]["RD"]
-				proc_stats[proc]["LOCS"][location]["WR"] = stats[location]["PIDS"][proc]["WR"]
-				proc_stats[proc]["LOCS"][location]["ACQ"] = stats[location]["PIDS"][proc]["ACQ"]
-				proc_stats[proc]["LOCS"][location]["REL"] = stats[location]["PIDS"][proc]["REL"]
-				proc_stats[proc]["LOCS"][location]["FAIL_ACQ"] = stats[location]["PIDS"][proc]["FAIL_ACQ"]
-			else:
-				proc_stats[proc]["NUM_Locs"] += 1
-				proc_stats[proc]["LOCS"][location] = {}
-				proc_stats[proc]["LOCS"][location]["RD"] = stats[location]["PIDS"][proc]["RD"]
-				proc_stats[proc]["LOCS"][location]["WR"] = stats[location]["PIDS"][proc]["WR"]
-				proc_stats[proc]["LOCS"][location]["ACQ"] = stats[location]["PIDS"][proc]["ACQ"]
-				proc_stats[proc]["LOCS"][location]["REL"] = stats[location]["PIDS"][proc]["REL"]
-				proc_stats[proc]["LOCS"][location]["FAIL_ACQ"] = stats[location]["PIDS"][proc]["FAIL_ACQ"]
-#Updating total number of read and writes
-for proc in proc_stats:
+			#except KeyError:
+				proc_stats[proc] = {}
+				proc_stats[proc]["LOCS"] = {}
+				proc_stats[proc]["NUM_Locs"] = 0
+				proc_stats[proc]["RD"] = 0
+				proc_stats[proc]["WR"] = 0
+				proc_stats[proc]["ACQ"] = 0
+				proc_stats[proc]["REL"] = 0
+				proc_stats[proc]["FAIL_ACQ"] = 0
+				if proc_stats[proc]["LOCS"].has_key(location):
+					proc_stats[proc]["LOCS"][location]["RD"] = stats[location]["PIDS"][proc]["RD"]
+					proc_stats[proc]["LOCS"][location]["WR"] = stats[location]["PIDS"][proc]["WR"]
+					proc_stats[proc]["LOCS"][location]["ACQ"] = stats[location]["PIDS"][proc]["ACQ"]
+					proc_stats[proc]["LOCS"][location]["REL"] = stats[location]["PIDS"][proc]["REL"]
+					proc_stats[proc]["LOCS"][location]["FAIL_ACQ"] = stats[location]["PIDS"][proc]["FAIL_ACQ"]
+				else:
+					proc_stats[proc]["NUM_Locs"] += 1
+					proc_stats[proc]["LOCS"][location] = {}
+					proc_stats[proc]["LOCS"][location]["RD"] = stats[location]["PIDS"][proc]["RD"]
+					proc_stats[proc]["LOCS"][location]["WR"] = stats[location]["PIDS"][proc]["WR"]
+					proc_stats[proc]["LOCS"][location]["ACQ"] = stats[location]["PIDS"][proc]["ACQ"]
+					proc_stats[proc]["LOCS"][location]["REL"] = stats[location]["PIDS"][proc]["REL"]
+					proc_stats[proc]["LOCS"][location]["FAIL_ACQ"] = stats[location]["PIDS"][proc]["FAIL_ACQ"]
+	#Updating total number of read and writes
+	for proc in proc_stats:
 	for location in proc_stats[proc]["LOCS"]:
 		proc_stats[proc]["RD"] += proc_stats[proc]["LOCS"][location]["RD"]
 		proc_stats[proc]["WR"] += proc_stats[proc]["LOCS"][location]["WR"]
