@@ -29,6 +29,15 @@ for sync_index in range(int(math.ceil(int(num_crit_sec)/26.0))):
 		sync_labels.append(letter + str(sync_index))
 
 
+file = []		
+#Reading input files
+for core in range(int(num_cores)):
+	core_id = "Core%d" %core
+	file_name = core_id + ".txt"
+	target = open(file_name, 'r')
+	file.append(target.readlines())
+	target.close
+
 for l in range(int(num_crit_sec)):
 
 	#Generating the critical section
@@ -57,11 +66,6 @@ for l in range(int(num_crit_sec)):
 	for i in range(int(crit_sec_instances)):
 		
 		j = random.randint(0, int(num_cores)-1)
-		core_id = "Core%d" %j
-		file_name = core_id + ".txt"
-		target = open(file_name, 'r')
-		file = target.readlines()
-		target.close
 		
 		if not (crit_directory[sync_var].has_key(file_name)):
 			crit_directory[sync_var][file_name] = []
@@ -84,13 +88,18 @@ for l in range(int(num_crit_sec)):
 		crit_directory[sync_var][file_name] = tmp_list
 
 		for inst in critical_section:
-			file.insert(k, inst)
+			file[j].insert(k, inst)
 			k += 1
 			
-		target = open(file_name, 'w')
-		target.writelines(file)
-		target.close
 		if DEBUG_MODE:
 			print file_name + " changed" + " in line" + str(k-(int(size_crit_sec)+2)) + ".\n"
 
+#Writing input files
+for core in range(int(num_cores)):
+	core_id = "Core%d" %core
+	file_name = core_id + ".txt"
+	target = open(file_name, 'w')
+	target.writelines(file[core])
+	target.close
+			
 print "Crit_Sec_Gen : Done!"
